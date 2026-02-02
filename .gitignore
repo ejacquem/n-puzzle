@@ -1,0 +1,8 @@
+# ===== Java build output =====
+bin/
+build/
+*.class
+*.jar
+
+# ===== JavaFX / external libs =====
+lib/
