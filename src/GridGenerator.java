@@ -4,7 +4,7 @@ public class GridGenerator {
     public static int[][] generate(int cols, int rows) {
         int[][] grid = new int[rows][cols];
 
-        Random rand = new Random();
+        Random rand = new Random(43);
 
         double obstacleProbability = 0.2; // 20% cells will be obstacles
 

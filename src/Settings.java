@@ -1,3 +1,3 @@
 public class Settings {
-    public static boolean showNodeInfo = false;
+    public static boolean showNodeInfo = true;
 }

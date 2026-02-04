@@ -1,5 +1,7 @@
 import java.util.Map;
 
+import Node.NodeSearch;
+import Node.StateGrid;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -20,66 +22,81 @@ public class AStarRenderer {
         gc = canvas.getGraphicsContext2D();
     }
 
+    public void setAStar(AStar astar) {
+        this.astar = astar;
+    }
+
     public void draw() {
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        drawMap(Node.map);
-        drawStartEnd();
+        drawAStarGrid();
+    }
+
+    public void drawAStarGrid() {
+        if (astar == null) return;
+        drawMap(((StateGrid)astar.start.state).problem.map);
+        drawStartGoal((StateGrid)astar.start.state, (StateGrid)astar.goal.state);
         drawOpen();
         drawClose();
         drawPath();
-        drawGrid();
+        drawGrid(((StateGrid)astar.start.state).problem.map);
     }
 
-    private void drawStartEnd() {
+    private void drawStartGoal(StateGrid start, StateGrid goal) {
         gc.setFill(Color.BLUE);
-        gc.fillRect(astar.start.x * TILE_SIZE, astar.start.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        gc.fillRect(start.x * TILE_SIZE, start.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         gc.setFill(Color.RED);
-        gc.fillRect(astar.end.x * TILE_SIZE, astar.end.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        gc.fillRect(goal.x * TILE_SIZE, goal.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    private void drawTileNode(Node node, Color color) {
+    private void drawTileNode(NodeSearch node, Color color) {
         gc.setFill(color);
-        gc.fillRect(node.x * TILE_SIZE, node.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        StateGrid state = (StateGrid) node.state;
+        gc.fillRect(state.x * TILE_SIZE, state.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         drawTileNodeInfo(node);
     }
 
-    private void drawTileNodeInfo(Node node) {
+    private void drawTileNodeInfo(NodeSearch node) {
         if (Settings.showNodeInfo == false) {
             return;
         }
         float y = 3;
         float x = 0;
-        drawStringAt(gc, node.x, node.y, x, y * -1, "g=" + node.g, Color.BLACK);
-        drawStringAt(gc, node.x, node.y, x, y * 0, "h=" + node.h, Color.BLACK);
-        drawStringAt(gc, node.x, node.y, x, y * 1, "f=" + node.getF(), Color.BLACK);
+        StateGrid state = (StateGrid) node.state;
+        drawStringAt(gc, state.x, state.y, x, y * -1, "g=" + node.getG(), Color.BLACK);
+        drawStringAt(gc, state.x, state.y, x, y * 0, "h=" + node.getH(), Color.BLACK);
+        drawStringAt(gc, state.x, state.y, x, y * 1, "f=" + node.getF(), Color.BLACK);
     }
 
     private void drawOpen() {
-        for (Node node : astar.open) {
+        for (NodeSearch node : astar.open) {
             drawTileNode(node, Color.rgb(250, 250, 150));
         }
     }
 
     private void drawClose() {
-        for (Map.Entry<Integer, Node> entry : astar.close.entrySet()) {
-            Node node = entry.getValue();
+        for (Map.Entry<Integer, NodeSearch> entry : astar.close.entrySet()) {
+            NodeSearch node = entry.getValue();
             drawTileNode(node, Color.rgb(250, 200, 200));
         }
     }
 
     private void drawPath() {
-        Node n = astar.open.peek();
+        NodeSearch n = astar.open.peek();
+        if (n != null) {
+            drawTileNode(n, Color.rgb(0, 255, 255));
+            n = n.getParent();
+        } 
         while (n != null) {
             drawTileNode(n, Color.rgb(0, 255, 0));
-            n = n.parent;
+            n = n.getParent();
         }
     }
 
-    private void drawGrid() {
-        int cols = Node.map.length;
-        int rows = Node.map[0].length;
+    public void drawGrid(int[][] map) {
+        int cols = map.length;
+        int rows = map[0].length;
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(gridWidth);
         double w = gridWidth / 2;
@@ -98,7 +115,7 @@ public class AStarRenderer {
         }
     }
 
-    private void drawMap(int map[][]) {
+    public void drawMap(int map[][]) {
         for (int row = 0; row < map.length; row++) {
             for (int col = 0; col < map[row].length; col++) {
                 if (map[row][col] == 0) {

@@ -14,7 +14,7 @@ JAVA_FX_ZIP = openjfx-$(JAVA_FX_VERSION)_linux-x64_bin-sdk.zip
 JAVA_FX_URL = https://download2.gluonhq.com/openjfx/$(JAVA_FX_VERSION)/$(JAVA_FX_ZIP)
 JAVA_FX_MODULES = javafx.controls,javafx.graphics
 
-SOURCES = $(wildcard $(SRC_DIR)/*.java)
+SOURCES = $(wildcard $(SRC_DIR)/*.java $(SRC_DIR)/Node/*.java)
 
 all: check_javafx $(NAME) 
 

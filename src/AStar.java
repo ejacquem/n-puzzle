@@ -2,27 +2,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class AStar {
-    PriorityQueue<Node> open;
-    HashMap<Integer, Node> openMap;
-    HashMap<Integer, Node> close;
-    Node start;
-    Node end;
+import Node.NodeSearch;
+import Node.State;
 
-    AStar(Node start, Node end, int[][] map) {
+public class AStar {
+    PriorityQueue<NodeSearch> open;
+    HashMap<Integer, NodeSearch> openMap;
+    HashMap<Integer, NodeSearch> close;
+    NodeSearch start;
+    NodeSearch goal;
+
+    AStar(NodeSearch start, NodeSearch goal) {
         open = new PriorityQueue<>();
         openMap = new HashMap<>();
         close = new HashMap<>();
 
         this.start = start;
-        this.end = end;
+        this.goal = goal;
 
-        Node.map = map;
-        Node.target = end;
-        start.h = Node.heuristic(start, end);
+        System.out.println("Staring Astar: ");
+        System.out.println("Start Node: ");
+        start.printNode();
+        System.out.println("Goal Node: ");
+        goal.printNode();
 
         open.add(start);
-        openMap.put(start.hash(), start);
+        openMap.put(start.state.hashCode(), start);
     }
 
     public void step() {
@@ -31,42 +36,51 @@ public class AStar {
             return;
         }
         
-        if (open.peek().getH() == 0){
-            System.out.println("End node found !");
+        if (open.peek().state.isGoal(goal.state)){
+            System.out.println("goal node found !");
             return;
         }
 
-        System.out.println("Step");
-        System.out.println("open.size: " + open.size());
-        System.out.println("openMap.size: " + openMap.size());
-        System.out.println("close.size: " + close.size());
+        System.out.println("\n=========== Step ===========");
+        System.out.printf("open.size: %3d, openMap.size: %3d, close.size: %3d\n", open.size(), openMap.size(), close.size());
 
-        Node current = open.poll();
-        close.put(current.hash(), current);
+        NodeSearch current = open.poll();
+        close.put(current.state.hashCode(), current);
+        
+        System.out.println("Current Node: ");
+        current.printNode();
 
-        List<Node> neighbours = current.generateNeighbour();
-        for (Node node : neighbours) {
-            if (node == null) {
-                System.out.println("Node null");
-            } else {
-                node.printNode();
+        List<State> neighbours = current.state.neighbors();
+        System.out.println("Neighbour Debug -----");
+        for (State state : neighbours) {
+
+            System.out.print("Visiting neighbour state: ");
+            
+            // if state already visited, skip
+            if (state == null) {
+                System.out.println("null");
+                continue;
             }
-
-            // if node already visited, skip
-            if (node == null || close.containsKey(node.hash())) {
+            state.print();
+            
+            if (close.containsKey(state.hashCode())) {
+                System.out.println("state already closed");
                 continue;
             }
 
             //if node was already generated, replace the values
-            if (openMap.containsKey(node.hash())) {
-                Node n = openMap.get(node.hash());
-                if (node.getF() < n.getF()) {
-                    openMap.get(node.hash()).parent = current;
-                    openMap.get(node.hash()).g = current.g + 1;
+            if (openMap.containsKey(state.hashCode())) {
+                NodeSearch node = openMap.get(state.hashCode());
+                System.out.println("Node already visited: node.getParent().getG() = " + node.getParent().getG() + ", current.getG() = " + current.getG());
+                if (current.getG() < node.getParent().getG()) {
+                    node.setParent(current);
+                    open.remove(node);
+                    open.add(node);
                 }
             } else { //  if node is new, add it to queue
+                NodeSearch node = new NodeSearch(state, goal.state, current);
                 open.add(node);
-                openMap.put(node.hash(), node);
+                openMap.put(node.state.hashCode(), node);
             }
         }
     }
