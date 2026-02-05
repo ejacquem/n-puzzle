@@ -18,7 +18,8 @@ public class Main extends Application {
     private static final int HEIGHT = 800;
 
     private AStarRenderer renderer;
-    private AStar aStar;
+    private AStar astar;
+    int solutionPathIndex = 0;
 
     @Override
     public void start(Stage stage) {
@@ -32,19 +33,31 @@ public class Main extends Application {
 
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-        renderer = new AStarRenderer(canvas, aStar);
+        renderer = new AStarRenderer(canvas, astar);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
                 stage.close();
             }
             if (event.getCode() == javafx.scene.input.KeyCode.SPACE) {
-                if (aStar == null) return;
-                aStar.step();
-                renderer.draw();
+                if (astar == null) return;
+                if (astar.solutionFound) {
+                    if (solutionPathIndex < astar.path.size()) {
+                        NodeSearch node = astar.path.get(solutionPathIndex);
+                        solutionPathIndex++;
+                        renderer.drawBackGround();
+                        renderer.drawPuzzleNode(node, 0, 0);
+                    }
+                } else {
+                    astar.step();
+                    renderer.draw();
+                }
             }
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 launchAStar(map);
+                while(astar.solutionFound == false && astar.solutionDoesntExist == false){
+                    astar.step();
+                }
                 renderer.draw();
             }
         });
@@ -71,9 +84,11 @@ public class Main extends Application {
                 
                 int tx = (int)x / AStarRenderer.TILE_SIZE;
                 int ty = (int)y / AStarRenderer.TILE_SIZE;
-                map[ty][tx] = event.getButton() == MouseButton.PRIMARY ? 1 : 0;
-                renderer.drawMap(map);
-                renderer.drawGrid(map);
+                if (ty >= 0 && ty < map.length && tx >= 0 && tx < map[ty].length) {
+                    map[ty][tx] = event.getButton() == MouseButton.PRIMARY ? 1 : 0;
+                    renderer.drawMap(map);
+                    renderer.drawGrid(map);
+                }
             }
         });
 
@@ -82,30 +97,63 @@ public class Main extends Application {
         //     renderer.drawGrid(map);
         // });
 
-        renderer.drawMap(map);
-        renderer.drawGrid(map);
+        // renderer.drawMap(map);
+        // renderer.drawGrid(map);
 
         stage.setTitle("A* Visualizer");
         stage.setScene(scene);
         stage.show();
     }
+    
 
     public void launchAStar(int[][] map) {
-        StateGrid.GridProblem problem = new StateGrid.GridProblem(map);
+        solutionPathIndex = 0;
+        
+        NodeSearch endNode;
+        NodeSearch startNode;
 
-        StateGrid start = new StateGrid(0, 0, problem);
-        StateGrid goal = new StateGrid(map[0].length - 1, map.length - 1, problem);
-        NodeSearch endNode = new NodeSearch(goal, goal, null);
-        NodeSearch startNode = new NodeSearch(start, goal, null);
+        boolean truc = false;
+        if (truc) {
+            StateGrid.GridProblem problem = new StateGrid.GridProblem(map);
+            StateGrid start = new StateGrid(0, 0, problem);
+            StateGrid goal = new StateGrid(map[0].length - 1, map.length - 1, problem);
+            endNode = new NodeSearch(goal, goal, null);
+            startNode = new NodeSearch(start, goal, null);
+            map[start.y][start.x] = 0;
+            map[goal.y][goal.x] = 0;
+        } else {
+            // int[][] gridStart = {{1,2,3}, {4,5,6}, {7,8,0}};
+            // int[][] gridStart = {{3,4,7}, {6,8,5}, {1,2,0}};
+            // int[][] gridStart = {{1,4,2}, {3,0,5}, {6,7,8}}; // 2 move
+            
+            int[][] gridStart = {
+                {8,7,6}, 
+                {5,4,3}, 
+                {2,1,0}};
+            int[][] gridGoal = {{0,1,2}, {3,4,5}, {6,7,8}};
+            
+            // int[][] gridStart = {
+            //     {15, 14, 13, 12},
+            //     {11, 10,  9,  8},
+            //     { 7,  6,  5,  4},
+            //     { 3,  2,  1,  0}
+            // };
+            // int[][] gridGoal = {
+            //     { 0,  1,  2,  3},
+            //     { 4,  5,  6,  7},
+            //     { 8,  9, 10, 11},
+            //     {12, 13, 14, 15}
+            // };
+                    
+            StatePuzzle puzzleStart = new StatePuzzle(gridStart); 
+            StatePuzzle puzzleGoal = new StatePuzzle(gridGoal); 
+            endNode = new NodeSearch(puzzleGoal, puzzleGoal, null);
+            startNode = new NodeSearch(puzzleStart, puzzleGoal, null);
+        }
 
-        //TODO
-        // int[3][3] = {{1,2,3}, {1,2,3}, {1,2,3}, };//TODO
-        // StatePuzzle start = new StatePuzzle(WIDTH, HEIGHT, map); 
+        astar = new AStar(startNode, endNode);
 
-        map[start.y][start.x] = 0;
-        map[goal.y][goal.x] = 0;
-        aStar = new AStar(startNode, endNode);
-        renderer.setAStar(aStar);
+        renderer.setAStar(astar);
         renderer.draw();
     }
 

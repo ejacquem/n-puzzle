@@ -9,6 +9,36 @@ public class StatePuzzle implements State {
     public final int[][] grid;
 
     public StatePuzzle(int x, int y, int[][] grid) {
+        if (grid == null) {
+            throw new IllegalArgumentException("grid cannot be null");
+        }
+
+        this.x = x;
+        this.y = y;
+        this.grid = grid;
+    }
+
+    public StatePuzzle(int[][] grid) {
+        if (grid == null) {
+            throw new IllegalArgumentException("grid cannot be null");
+        }
+
+        int x = -1, y = -1;
+        outer:
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == 0){
+                    x = j;
+                    y = i;
+                    break outer;
+                }
+            }
+        }
+
+        if (x == -1) {
+            throw new IllegalArgumentException("grid must contain a zero tile");
+        }
+
         this.x = x;
         this.y = y;
         this.grid = grid;
@@ -36,10 +66,14 @@ public class StatePuzzle implements State {
 
         int[][] newGrid = gridDeepCopy(grid);
 
+        // PuzzleUtils.print2DArray(newGrid, 3);
+        
         newGrid[this.y][this.x] = newGrid[y][x];
         newGrid[y][x] = 0;
 
-        list.add(new StatePuzzle(x, y, grid));
+        // PuzzleUtils.print2DArray(newGrid, 3);
+
+        list.add(new StatePuzzle(x, y, newGrid));
     }
 
     int manhattan(int ax, int ay, int bx, int by) {
@@ -50,14 +84,17 @@ public class StatePuzzle implements State {
     public int heuristic(State goal) {
         int score = 0;
         StatePuzzle g = (StatePuzzle) goal;
+        // System.out.println("heuristic:");
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                // int number = grid[i][j];
-                // int x = number % grid[i].length;
-                // int y = number / grid.length;
-                // score += manhattan(j, i, x, y);
-                score += Math.abs(grid[i][j] - g.grid[i][j]);
+                int number = grid[i][j];
+                int x = number % grid[i].length;
+                int y = number / grid.length;
+                score += manhattan(j, i, x, y);
+                // System.out.printf("%3d ", manhattan(j, i, x, y));
+                // score += Math.abs(grid[i][j] - g.grid[i][j]);
             }
+            // System.out.println();
         }
         return score;
     }

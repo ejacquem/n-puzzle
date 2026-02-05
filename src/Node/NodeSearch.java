@@ -54,12 +54,12 @@ public class NodeSearch implements Comparable<NodeSearch> {
 
     public void printNode() {
         state.print();
-        System.out.print("h = " + h + ", g = " + g + ", ");
-        System.out.print("Parent: ");
-        if (parent != null) {
-            parent.state.print();
-        } else {
-            System.out.println("null");
-        }
+        System.out.println("h = " + h + ", g = " + g + ", ");
+        // System.out.print("Parent: ");
+        // if (parent != null) {
+        //     parent.state.print();
+        // } else {
+        //     System.out.println("null");
+        // }
     }
 }

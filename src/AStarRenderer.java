@@ -1,7 +1,11 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import Node.NodeSearch;
+import Node.State;
 import Node.StateGrid;
+import Node.StatePuzzle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -27,20 +31,42 @@ public class AStarRenderer {
     }
 
     public void draw() {
-        gc.setFill(Color.DARKGRAY);
-        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawBackGround();
 
         drawAStarGrid();
+        drawAStarPuzzle();
+    }
+
+    public void drawBackGround() {
+        gc.setFill(Color.DARKGRAY);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 
     public void drawAStarGrid() {
-        if (astar == null) return;
+        if (astar == null || !(astar.start.state instanceof StateGrid)) return;
         drawMap(((StateGrid)astar.start.state).problem.map);
         drawStartGoal((StateGrid)astar.start.state, (StateGrid)astar.goal.state);
         drawOpen();
         drawClose();
         drawPath();
         drawGrid(((StateGrid)astar.start.state).problem.map);
+    }
+
+
+    public void drawAStarPuzzle() {
+        if (astar == null || !(astar.start.state instanceof StatePuzzle)) return;
+        // drawPuzzle(((StatePuzzle)astar.open.peek().state).grid);
+        
+        NodeSearch currentNode = astar.open.peek();
+        StatePuzzle currentState = ((StatePuzzle)astar.open.peek().state);
+        drawPuzzleNode(currentNode, 0, 0);
+        
+        int i = 0;
+        for (State state : currentNode.state.neighbors()) {
+            NodeSearch n = new NodeSearch(state, astar.goal.state, currentNode);
+            drawPuzzleNode(n, TILE_SIZE * (currentState.grid.length + 1), TILE_SIZE * (currentState.grid.length + 1) * i);
+            i++;
+        }
     }
 
     private void drawStartGoal(StateGrid start, StateGrid goal) {
@@ -126,6 +152,36 @@ public class AStarRenderer {
                 gc.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
+    }
+
+    public void drawPuzzle(int map[][]) {
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+                float size = map.length;
+                int color = (int) (125f + 125f * ((map[y][x]) / (size * size)));
+                // if (map[y][x] == 0) {
+                //     color = 255;
+                // }
+                gc.setFill(Color.rgb(color, color, color));
+                gc.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                if (map[y][x] != 0) {
+                    drawStringAt(gc, x, y, 0f, 0f, Integer.toString(map[y][x]), Color.BLACK);
+                }
+            }
+        }
+        drawGrid(map);
+    }
+
+    public void drawPuzzleNode(NodeSearch node, int x, int y) {
+        gc.translate(x, y);
+
+        StatePuzzle state = (StatePuzzle) node.state;
+        drawPuzzle(state.grid);
+        drawStringAt(gc, state.grid.length, 0, 0, 0, "g=" + node.getG(), Color.BLACK);
+        drawStringAt(gc, state.grid.length, 1, 0, 0, "h=" + node.getH(), Color.BLACK);
+        drawStringAt(gc, state.grid.length, 2, 0, 0, "f=" + node.getF(), Color.BLACK);
+     
+        gc.translate(-x, -y);
     }
 
     private void drawStringAt(GraphicsContext gc, int x, int y, float anchorx, float anchory, String str, Color color) {
