@@ -8,8 +8,8 @@ import Node.State;
 
 public class AStar {
     PriorityQueue<NodeSearch> open;
-    HashMap<Integer, NodeSearch> openMap;
-    HashMap<Integer, NodeSearch> close;
+    HashMap<Node.State, NodeSearch> openMap;
+    HashMap<Node.State, NodeSearch> close;
     NodeSearch start;
     NodeSearch goal;
 
@@ -34,7 +34,7 @@ public class AStar {
         goal.printNode();
 
         open.add(start);
-        openMap.put(start.state.hashCode(), start);
+        openMap.put(start.state, start);
     }
 
     public void step() {
@@ -43,14 +43,14 @@ public class AStar {
             solutionDoesntExist = true;
         }
         
-        if (open.peek().state.isGoal(goal.state)){
+        if (open.peek().state.equals(goal.state)){
             System.out.println("goal node found !");
             solutionFound = true;
             path = generatePath(open.peek());
         }
 
         NodeSearch current = open.poll();
-        close.put(current.state.hashCode(), current);
+        close.put(current.state, current);
         
         // System.out.println("\n=========== Step ===========");
         // System.out.printf("open.size: %3d, openMap.size: %3d, close.size: %3d\n", open.size(), openMap.size(), close.size());
@@ -59,13 +59,20 @@ public class AStar {
 
         List<State> neighbours = current.state.neighbors();
         for (State state : neighbours) {
-            if (state == null || close.containsKey(state.hashCode())) {
+            if (state == null || close.containsKey(state)) {
                 continue;
             }
 
             //if node was already generated, replace the values
-            if (openMap.containsKey(state.hashCode())) {
-                NodeSearch node = openMap.get(state.hashCode());
+            if (openMap.containsKey(state)) {
+                NodeSearch node = openMap.get(state);
+                // if (!node.state.equals(state)) {
+                //     System.out.println();
+                //     state.print();
+                //     System.out.println("hey");
+                //     node.state.print();
+                //     throw new IllegalArgumentException("What ?");
+                // }
                 // System.out.println("Node already visited: node.getParent().getG() = " + node.getParent().getG() + ", current.getG() = " + current.getG());
                 if (current.getG() < node.getParent().getG()) {
                     node.setParent(current);
@@ -75,7 +82,7 @@ public class AStar {
             } else { // if node is new, add it to queue
                 NodeSearch node = new NodeSearch(state, goal.state, current);
                 open.add(node);
-                openMap.put(node.state.hashCode(), node);
+                openMap.put(node.state, node);
             }
         }
     }

@@ -102,7 +102,7 @@ public class AStarRenderer {
     }
 
     private void drawClose() {
-        for (Map.Entry<Integer, NodeSearch> entry : astar.close.entrySet()) {
+        for (Map.Entry<State, NodeSearch> entry : astar.close.entrySet()) {
             NodeSearch node = entry.getValue();
             drawTileNode(node, Color.rgb(250, 200, 200));
         }

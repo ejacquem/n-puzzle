@@ -100,8 +100,8 @@ public class StatePuzzle implements State {
     }
 
     @Override
-    public boolean isGoal(State goal) {
-        StatePuzzle g = (StatePuzzle) goal;
+    public boolean equals(State other) {
+        StatePuzzle g = (StatePuzzle) other;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
                 if (grid[i][j] != g.grid[i][j]){
