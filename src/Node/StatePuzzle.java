@@ -83,7 +83,7 @@ public class StatePuzzle implements State {
     @Override
     public int heuristic(State goal) {
         int score = 0;
-        StatePuzzle g = (StatePuzzle) goal;
+        // StatePuzzle g = (StatePuzzle) goal;
         // System.out.println("heuristic:");
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
@@ -100,8 +100,11 @@ public class StatePuzzle implements State {
     }
 
     @Override
-    public boolean equals(State other) {
+    public boolean equals(Object other) {
         StatePuzzle g = (StatePuzzle) other;
+        if (this.x != g.x || this.y != g.y) {
+            return false;
+        }
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
                 if (grid[i][j] != g.grid[i][j]){

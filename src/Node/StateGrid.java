@@ -40,7 +40,7 @@ public class StateGrid implements State {
     }
 
     @Override
-    public boolean equals(State other) {
+    public boolean equals(Object other) {
         StateGrid g = (StateGrid) other;
         return (this.x == g.x && this.y == g.y);
     }

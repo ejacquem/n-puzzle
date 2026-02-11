@@ -37,6 +37,12 @@ public class AStar {
         openMap.put(start.state, start);
     }
 
+    public void solve() {
+        while(solutionFound == false && solutionDoesntExist == false){
+            step();
+        }
+    }
+
     public void step() {
         if (open.isEmpty()){
             System.out.println("No Path found !");
@@ -66,13 +72,6 @@ public class AStar {
             //if node was already generated, replace the values
             if (openMap.containsKey(state)) {
                 NodeSearch node = openMap.get(state);
-                // if (!node.state.equals(state)) {
-                //     System.out.println();
-                //     state.print();
-                //     System.out.println("hey");
-                //     node.state.print();
-                //     throw new IllegalArgumentException("What ?");
-                // }
                 // System.out.println("Node already visited: node.getParent().getG() = " + node.getParent().getG() + ", current.getG() = " + current.getG());
                 if (current.getG() < node.getParent().getG()) {
                     node.setParent(current);

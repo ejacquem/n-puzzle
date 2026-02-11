@@ -55,9 +55,8 @@ public class Main extends Application {
             }
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 launchAStar(map);
-                while(astar.solutionFound == false && astar.solutionDoesntExist == false){
-                    astar.step();
-                }
+                // astar.step();
+                astar.solve();
                 renderer.draw();
             }
         });
@@ -126,24 +125,24 @@ public class Main extends Application {
             // int[][] gridStart = {{3,4,7}, {6,8,5}, {1,2,0}};
             // int[][] gridStart = {{1,4,2}, {3,0,5}, {6,7,8}}; // 2 move
             
-            // int[][] gridStart = {
-            //     {8,7,6}, 
-            //     {5,4,3}, 
-            //     {2,1,0}};
-            // int[][] gridGoal = {{0,1,2}, {3,4,5}, {6,7,8}};
-            
             int[][] gridStart = {
-                {15, 14, 13, 12},
-                {11, 10,  9,  8},
-                { 7,  6,  5,  4},
-                { 3,  2,  1,  0}
-            };
-            int[][] gridGoal = {
-                { 0,  1,  2,  3},
-                { 4,  5,  6,  7},
-                { 8,  9, 10, 11},
-                {12, 13, 14, 15}
-            };
+                {8,7,6}, 
+                {5,4,3}, 
+                {2,1,0}};
+            int[][] gridGoal = {{0,1,2}, {3,4,5}, {6,7,8}};
+            
+            // int[][] gridStart = {
+            //     {15, 14, 13, 12},
+            //     {11, 10,  9,  8},
+            //     { 7,  6,  5,  4},
+            //     { 3,  2,  1,  0}
+            // };
+            // int[][] gridGoal = {
+            //     { 0,  1,  2,  3},
+            //     { 4,  5,  6,  7},
+            //     { 8,  9, 10, 11},
+            //     {12, 13, 14, 15}
+            // };
                     
             StatePuzzle puzzleStart = new StatePuzzle(gridStart); 
             StatePuzzle puzzleGoal = new StatePuzzle(gridGoal); 

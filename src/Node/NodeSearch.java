@@ -4,16 +4,19 @@ public class NodeSearch implements Comparable<NodeSearch> {
     public final State state;
     private int g; // g cost: distance from starting position
     private int h; // h cost: distance from end node (heuristic)
+    private int f;
     private NodeSearch parent;
 
     public NodeSearch(State state, State goal, NodeSearch parent) {
         this.state = state;
         this.setParent(parent);
         this.computeHeuristic(goal);
+        this.f = g + h;
     }
 
     public int getF() {
-        return g + h;
+        return f;
+        // return g + h;
     }
 
     public int getH() {
@@ -35,6 +38,7 @@ public class NodeSearch implements Comparable<NodeSearch> {
     public void setParent(NodeSearch parent) {
         this.parent = parent;
         this.g = (parent == null) ? 0 : parent.getG() + 1;
+        this.f = g + h;
     }
 
     public void setMinParent(NodeSearch parent) {
@@ -42,6 +46,7 @@ public class NodeSearch implements Comparable<NodeSearch> {
         if (ng > g) return; // only assign new g from the smaller parent
         this.parent = parent;
         this.g = Math.min(this.g, ng); 
+        this.f = g + h;
     }
 
     @Override
