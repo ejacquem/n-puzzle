@@ -17,6 +17,7 @@ public class AStar {
     public boolean solutionDoesntExist = false;
 
     public List<NodeSearch> path;
+    public NodeSearch endNode;
 
     AStar(NodeSearch start, NodeSearch goal) {
         open = new PriorityQueue<>();
@@ -49,19 +50,20 @@ public class AStar {
             solutionDoesntExist = true;
         }
         
-        if (open.peek().state.equals(goal.state)){
-            System.out.println("goal node found !");
-            solutionFound = true;
-            path = generatePath(open.peek());
-        }
-
         NodeSearch current = open.poll();
+        openMap.remove(current.state);
+        if (close.containsKey(current.state)) { // this happens when the node was already visited and has been "replaced" in the priority queue
+            return;
+        }
         close.put(current.state, current);
         
-        // System.out.println("\n=========== Step ===========");
-        // System.out.printf("open.size: %3d, openMap.size: %3d, close.size: %3d\n", open.size(), openMap.size(), close.size());
-        // System.out.println("Current Node: ");
-        // current.printNode();
+        if (current.state.equals(goal.state)){
+            solutionFound = true;
+            path = generatePath(current);
+            endNode = current;
+            return;
+        }
+
 
         List<State> neighbours = current.state.neighbors();
         for (State state : neighbours) {
@@ -73,10 +75,9 @@ public class AStar {
             if (openMap.containsKey(state)) {
                 NodeSearch node = openMap.get(state);
                 // System.out.println("Node already visited: node.getParent().getG() = " + node.getParent().getG() + ", current.getG() = " + current.getG());
-                if (current.getG() < node.getParent().getG()) {
+                if (current.getG() < node.getG()) {
                     node.setParent(current);
-                    open.remove(node);
-                    open.add(node);
+                    open.add(node); // add node in priority queue (might twice in the queue but it's ok)
                 }
             } else { // if node is new, add it to queue
                 NodeSearch node = new NodeSearch(state, goal.state, current);

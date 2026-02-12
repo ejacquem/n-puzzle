@@ -7,6 +7,8 @@ import java.util.List;
 public class StatePuzzle implements State {
     public final int x, y;
     public final int[][] grid;
+    public Position[] goalPositions;
+
 
     public StatePuzzle(int x, int y, int[][] grid) {
         if (grid == null) {
@@ -42,6 +44,17 @@ public class StatePuzzle implements State {
         this.x = x;
         this.y = y;
         this.grid = grid;
+    }
+
+    public void setGoalPosition() {
+        goalPositions = new Position[grid.length * grid[y].length];
+
+        for (int y = 0; y < grid.length; y++) {
+            for (int x = 0; x < grid[y].length; x++) {
+                int value = grid[y][x];
+                goalPositions[value] = new Position(x, y);
+            }
+        }
     }
 
     @Override
@@ -83,18 +96,15 @@ public class StatePuzzle implements State {
     @Override
     public int heuristic(State goal) {
         int score = 0;
-        // StatePuzzle g = (StatePuzzle) goal;
-        // System.out.println("heuristic:");
+        StatePuzzle g = (StatePuzzle) goal;
+        
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
                 int number = grid[i][j];
-                int x = number % grid[i].length;
-                int y = number / grid.length;
-                score += manhattan(j, i, x, y);
-                // System.out.printf("%3d ", manhattan(j, i, x, y));
-                // score += Math.abs(grid[i][j] - g.grid[i][j]);
+                if (number == 0) continue;
+                Position goalPos = g.goalPositions[number];
+                score += manhattan(j, i, goalPos.x, goalPos.y);
             }
-            // System.out.println();
         }
         return score;
     }
@@ -137,4 +147,15 @@ public class StatePuzzle implements State {
         }
         return copy;
     }
+
+    public class Position {
+        public final int x;
+        public final int y;
+    
+        public Position(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    
 }
