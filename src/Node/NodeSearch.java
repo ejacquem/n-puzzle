@@ -1,5 +1,8 @@
 package Node;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NodeSearch implements Comparable<NodeSearch> {
     public final State state;
     private int g; // g cost: distance from starting position
@@ -41,14 +44,6 @@ public class NodeSearch implements Comparable<NodeSearch> {
         this.f = g + h;
     }
 
-    public void setMinParent(NodeSearch parent) {
-        int ng = (parent == null) ? 0 : parent.getG() + 1; //new g value based on parent value
-        if (ng > g) return; // only assign new g from the smaller parent
-        this.parent = parent;
-        this.g = Math.min(this.g, ng); 
-        this.f = g + h;
-    }
-
     @Override
     public int compareTo(NodeSearch other) {
         if (this.getF() == other.getF()) {
@@ -66,5 +61,15 @@ public class NodeSearch implements Comparable<NodeSearch> {
         // } else {
         //     System.out.println("null");
         // }
+    }
+
+    public static List<NodeSearch> generatePath(NodeSearch node) {
+        List<NodeSearch> list = new ArrayList<>();
+        while (node != null) {
+            node.printNode();
+            list.add(0, node); // inefficient but idc
+            node = node.getParent();
+        }
+        return list;
     }
 }

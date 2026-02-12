@@ -33,8 +33,12 @@ public class AStarRenderer {
     public void draw() {
         drawBackGround();
 
-        drawAStarGrid();
-        drawAStarPuzzle();
+        if (astar == null || astar.start == null) return;
+        if (astar.start.state instanceof StateGrid) {
+            drawAStarGrid();
+        } else {
+            drawAStarPuzzle();
+        }
     }
 
     public void drawBackGround() {
@@ -43,7 +47,6 @@ public class AStarRenderer {
     }
 
     public void drawAStarGrid() {
-        if (astar == null || !(astar.start.state instanceof StateGrid)) return;
         drawMap(((StateGrid)astar.start.state).problem.map);
         drawStartGoal((StateGrid)astar.start.state, (StateGrid)astar.goal.state);
         drawOpen();
