@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
+import Algorithm.AStar;
 import Node.NodeSearch;
 import Node.State;
 import Node.StateGrid;
@@ -33,8 +32,8 @@ public class AStarRenderer {
     public void draw() {
         drawBackGround();
 
-        if (astar == null || astar.start == null) return;
-        if (astar.start.state instanceof StateGrid) {
+        if (astar == null || astar.getStart() == null) return;
+        if (astar.getStart().state instanceof StateGrid) {
             drawAStarGrid();
         } else {
             drawAStarPuzzle();
@@ -47,17 +46,17 @@ public class AStarRenderer {
     }
 
     public void drawAStarGrid() {
-        drawMap(((StateGrid)astar.start.state).problem.map);
-        drawStartGoal((StateGrid)astar.start.state, (StateGrid)astar.goal.state);
+        drawMap(((StateGrid)astar.getStart().state).problem.map);
+        drawStartGoal((StateGrid)astar.getStart().state, (StateGrid)astar.getGoal().state);
         drawOpen();
         drawClose();
         drawPath();
-        drawGrid(((StateGrid)astar.start.state).problem.map);
+        drawGrid(((StateGrid)astar.getStart().state).problem.map);
     }
 
 
     public void drawAStarPuzzle() {
-        if (astar == null || !(astar.start.state instanceof StatePuzzle)) return;
+        if (astar == null || !(astar.getStart().state instanceof StatePuzzle)) return;
         // drawPuzzle(((StatePuzzle)astar.open.peek().state).grid);
         
         NodeSearch currentNode = astar.open.peek();
@@ -66,7 +65,7 @@ public class AStarRenderer {
         
         int i = 0;
         for (State state : currentNode.state.neighbors()) {
-            NodeSearch n = new NodeSearch(state, astar.goal.state, currentNode);
+            NodeSearch n = new NodeSearch(state, astar.getGoal().state, currentNode);
             drawPuzzleNode(n, TILE_SIZE * (currentState.grid.length + 1), TILE_SIZE * (currentState.grid.length + 1) * i);
             i++;
         }
@@ -176,6 +175,7 @@ public class AStarRenderer {
     }
 
     public void drawPuzzleNode(NodeSearch node, int x, int y) {
+        if (node == null || !(node.state instanceof StatePuzzle)) return;
         gc.translate(x, y);
 
         StatePuzzle state = (StatePuzzle) node.state;

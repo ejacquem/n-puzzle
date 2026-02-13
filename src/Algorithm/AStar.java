@@ -1,3 +1,4 @@
+package Algorithm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -6,24 +7,26 @@ import java.util.PriorityQueue;
 import Node.NodeSearch;
 import Node.State;
 
-public class AStar {
-    PriorityQueue<NodeSearch> open;
-    HashMap<Node.State, NodeSearch> openMap;
-    HashMap<Node.State, NodeSearch> close;
-    NodeSearch start;
-    NodeSearch goal;
-
-    public boolean solutionFound = false;
-    public boolean solutionDoesntExist = false;
+public class AStar extends ASearchAlgorithm {
+    public PriorityQueue<NodeSearch> open;
+    public HashMap<Node.State, NodeSearch> openMap;
+    public HashMap<Node.State, NodeSearch> close;
 
     public List<NodeSearch> path;
     public NodeSearch endNode;
 
-    AStar(NodeSearch start, NodeSearch goal) {
+    public AStar() {
         open = new PriorityQueue<>();
         openMap = new HashMap<>();
         close = new HashMap<>();
         path = new ArrayList<>();
+    }
+
+    public boolean solve(NodeSearch start, NodeSearch goal) {
+        open.clear();
+        openMap.clear();
+        close.clear();
+        path.clear();
 
         this.start = start;
         this.goal = goal;
@@ -36,18 +39,16 @@ public class AStar {
 
         open.add(start);
         openMap.put(start.state, start);
-    }
-
-    public void solve() {
-        while(solutionFound == false && solutionDoesntExist == false){
+        while(solutionFound == false && solutionNotFound == false){
             step();
         }
+        return solutionFound;
     }
 
     public void step() {
         if (open.isEmpty()){
             System.out.println("No Path found !");
-            solutionDoesntExist = true;
+            solutionNotFound = true;
         }
         
         NodeSearch current = open.poll();
@@ -59,7 +60,7 @@ public class AStar {
         
         if (current.state.equals(goal.state)){
             solutionFound = true;
-            path = generatePath(current);
+            path = current.generatePath();
             endNode = current;
             return;
         }
@@ -87,16 +88,9 @@ public class AStar {
         }
     }
 
-    public List<NodeSearch> generatePath(NodeSearch node) {
-        List<NodeSearch> list = new ArrayList<>();
-        System.out.println("\n\n------------------- backtracking the path from node:");
-        int i = 0;
-        while (node != null) {
-            System.out.println("id: " + i++);
-            node.printNode();
-            list.add(0, node); // inefficient but idc
-            node = node.getParent();
-        }
-        return list;
+    @Override
+    public List<NodeSearch> getPath() {
+        return path;
     }
+
 }

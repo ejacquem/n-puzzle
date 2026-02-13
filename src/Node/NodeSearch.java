@@ -63,10 +63,11 @@ public class NodeSearch implements Comparable<NodeSearch> {
         // }
     }
 
-    public static List<NodeSearch> generatePath(NodeSearch node) {
+    public List<NodeSearch> generatePath() {
         List<NodeSearch> list = new ArrayList<>();
+        NodeSearch node = this;
         while (node != null) {
-            node.printNode();
+            // node.printNode();
             list.add(0, node); // inefficient but idc
             node = node.getParent();
         }

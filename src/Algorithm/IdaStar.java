@@ -1,39 +1,31 @@
+package Algorithm;
 import java.util.List;
 
 import Node.NodeSearch;
 import Node.State;
 
-public class IdaStar {
-    NodeSearch start;
-    NodeSearch goal;
+public class IdaStar extends ASearchAlgorithm {
+    private NodeSearch goal;
 
-    // private int threshold;
-
-    public boolean solutionFound = false;
-    public boolean solutionDoesntExist = false;
-
-    public List<NodeSearch> path;
     public NodeSearch endNode;
 
-    IdaStar(NodeSearch start, NodeSearch goal) {
-        this.start = start;
-        this.goal = goal;
-    }
+    public IdaStar() {}
 
-    public void solve() {
+    @Override
+    public boolean solve(NodeSearch start, NodeSearch goal) {
+        this.goal = goal;
         int threshold = start.getH();
 
         while (true) {
             int temp = search(start, threshold);
 
             if (temp == -1) {
-                solutionDoesntExist = true;
-                return;
+                return true;
             }
 
             if (temp == Integer.MAX_VALUE) {
-                solutionDoesntExist = true;
-                return;
+                solutionNotFound = true;
+                return false;
             }
 
             threshold = temp;
@@ -57,5 +49,10 @@ public class IdaStar {
             if (t < min) min = t;
         }
         return min;
+    }
+
+    @Override
+    public List<NodeSearch> getPath() {
+        return endNode.generatePath();
     }
 }

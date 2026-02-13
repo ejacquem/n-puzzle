@@ -7,7 +7,10 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
+import Algorithm.IdaStar;
+import Algorithm.ASearchAlgorithm;
 import Node.NodeSearch;
 import Node.StateGrid;
 import Node.StatePuzzle;
@@ -18,8 +21,13 @@ public class Main extends Application {
     private static final int HEIGHT = 800;
 
     private AStarRenderer renderer;
-    private AStar astar;
+    private ASearchAlgorithm algo;
     int solutionPathIndex = 0;
+
+    public List<NodeSearch> path;
+
+    private NodeSearch start;
+    private NodeSearch goal;
 
     @Override
     public void start(Stage stage) {
@@ -33,30 +41,32 @@ public class Main extends Application {
 
         StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-        renderer = new AStarRenderer(canvas, astar);
+        renderer = new AStarRenderer(canvas, null);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
                 stage.close();
             }
             if (event.getCode() == javafx.scene.input.KeyCode.SPACE) {
-                if (astar == null) return;
-                if (astar.solutionFound) {
-                    if (solutionPathIndex < astar.path.size()) {
-                        NodeSearch node = astar.path.get(solutionPathIndex);
+                if (algo == null) return;
+                if (path != null) {
+                    if (solutionPathIndex < path.size()) {
+                        NodeSearch node = path.get(solutionPathIndex);
                         solutionPathIndex++;
                         renderer.drawBackGround();
                         renderer.drawPuzzleNode(node, 0, 0);
                     }
                 } else {
-                    astar.step();
-                    renderer.draw();
+                    // astar.step();
+                    // renderer.draw();
                 }
             }
             if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 launchAStar(map);
                 // astar.step();
-                astar.solve();
+                // astar.solve();
+                algo.solve(start, goal);
+                path = algo.getPath();
                 renderer.draw();
             }
         });
@@ -108,15 +118,15 @@ public class Main extends Application {
     public void launchAStar(int[][] map) {
         solutionPathIndex = 0;
         
-        NodeSearch endNode;
+        NodeSearch goalNode;
         NodeSearch startNode;
 
-        boolean truc = false;
-        if (truc) {
+        boolean grid = false;
+        if (grid) {
             StateGrid.GridProblem problem = new StateGrid.GridProblem(map);
             StateGrid start = new StateGrid(0, 0, problem);
             StateGrid goal = new StateGrid(map[0].length - 1, map.length - 1, problem);
-            endNode = new NodeSearch(goal, goal, null);
+            goalNode = new NodeSearch(goal, goal, null);
             startNode = new NodeSearch(start, goal, null);
             map[start.y][start.x] = 0;
             map[goal.y][goal.x] = 0;
@@ -125,35 +135,39 @@ public class Main extends Application {
             // int[][] gridStart = {{3,4,7}, {6,8,5}, {1,2,0}};
             // int[][] gridStart = {{1,4,2}, {3,0,5}, {6,7,8}}; // 2 move
             
-            // int[][] gridStart = {
-            //     {8,7,6}, 
-            //     {5,4,3}, 
-            //     {2,1,0}};
-            // int[][] gridGoal = {{0,1,2}, {3,4,5}, {6,7,8}};
-            
             int[][] gridStart = {
-                {15, 14, 13, 12},
-                {11, 10,  9,  8},
-                { 7,  6,  5,  4},
-                { 3,  2,  1,  0}
-            };
-            int[][] gridGoal = {
-                { 0,  1,  2,  3},
-                { 4,  5,  6,  7},
-                { 8,  9, 10, 11},
-                {12, 13, 14, 15}
-            };
+                {8,7,6}, 
+                {5,4,3}, 
+                {2,1,0}};
+            int[][] gridGoal = {{0,1,2}, {3,4,5}, {6,7,8}};
+            
+            // int[][] gridStart = {
+            //     {15, 14, 13, 12},
+            //     {11, 10,  9,  8},
+            //     { 7,  6,  5,  4},
+            //     { 3,  2,  1,  0}
+            // };
+            // int[][] gridGoal = {
+            //     { 0,  1,  2,  3},
+            //     { 4,  5,  6,  7},
+            //     { 8,  9, 10, 11},
+            //     {12, 13, 14, 15}
+            // };
                     
             StatePuzzle puzzleStart = new StatePuzzle(gridStart); 
             StatePuzzle puzzleGoal = new StatePuzzle(gridGoal);
             puzzleGoal.setGoalPosition();
-            endNode = new NodeSearch(puzzleGoal, puzzleGoal, null);
+            goalNode = new NodeSearch(puzzleGoal, puzzleGoal, null);
             startNode = new NodeSearch(puzzleStart, puzzleGoal, null);
         }
 
-        astar = new AStar(startNode, endNode);
+        // astar = new AStar(startNode, endNode);
+        // idastar = new IdaStar();
+        algo = new IdaStar();
+        this.start = startNode;
+        this.goal = goalNode;
 
-        renderer.setAStar(astar);
+        // renderer.setAStar(astar);
         renderer.draw();
     }
 
