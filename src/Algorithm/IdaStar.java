@@ -5,27 +5,23 @@ import Node.NodeSearch;
 import Node.State;
 
 public class IdaStar extends ASearchAlgorithm {
-    private NodeSearch goal;
-
-    public NodeSearch endNode;
 
     public IdaStar() {}
 
-    @Override
-    public boolean solve(NodeSearch start, NodeSearch goal) {
-        this.goal = goal;
+    protected void solve() {
+        stepCount = 0;
         int threshold = start.getH();
 
         while (true) {
             int temp = search(start, threshold);
 
             if (temp == -1) {
-                return true;
+                return ;
             }
 
             if (temp == Integer.MAX_VALUE) {
                 solutionNotFound = true;
-                return false;
+                return ;
             }
 
             threshold = temp;
@@ -33,6 +29,7 @@ public class IdaStar extends ASearchAlgorithm {
     }
 
     public int search(NodeSearch node, int threshold) {
+        stepCount++;
         if (node.getF() > threshold) {
             return node.getF();
         }

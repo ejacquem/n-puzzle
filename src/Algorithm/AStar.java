@@ -13,7 +13,6 @@ public class AStar extends ASearchAlgorithm {
     public HashMap<Node.State, NodeSearch> close;
 
     public List<NodeSearch> path;
-    public NodeSearch endNode;
 
     public AStar() {
         open = new PriorityQueue<>();
@@ -22,14 +21,12 @@ public class AStar extends ASearchAlgorithm {
         path = new ArrayList<>();
     }
 
-    public boolean solve(NodeSearch start, NodeSearch goal) {
+    protected void solve() {
+        stepCount = 0;
         open.clear();
         openMap.clear();
         close.clear();
         path.clear();
-
-        this.start = start;
-        this.goal = goal;
 
         System.out.println("Staring Astar: ");
         System.out.println("Start Node: ");
@@ -42,10 +39,10 @@ public class AStar extends ASearchAlgorithm {
         while(solutionFound == false && solutionNotFound == false){
             step();
         }
-        return solutionFound;
     }
 
     public void step() {
+        stepCount++;
         if (open.isEmpty()){
             System.out.println("No Path found !");
             solutionNotFound = true;
