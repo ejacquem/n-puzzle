@@ -28,12 +28,6 @@ public class AStar extends ASearchAlgorithm {
         close.clear();
         path.clear();
 
-        System.out.println("Staring Astar: ");
-        System.out.println("Start Node: ");
-        start.printNode();
-        System.out.println("Goal Node: ");
-        goal.printNode();
-
         open.add(start);
         openMap.put(start.state, start);
         while(solutionFound == false && solutionNotFound == false){

@@ -73,4 +73,14 @@ public class NodeSearch implements Comparable<NodeSearch> {
         }
         return list;
     }
+
+    public int countParent() {
+        int count = 1; // itself
+        NodeSearch node = this;
+        while (node != null) {
+            count++;
+            node = node.getParent();
+        }
+        return count;
+    }
 }

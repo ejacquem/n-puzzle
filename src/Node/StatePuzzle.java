@@ -148,6 +148,59 @@ public class StatePuzzle implements State {
         return copy;
     }
 
+    // ----------------- Calculating if solvable -----------------
+    
+    public static boolean canReach(StatePuzzle start, StatePuzzle goal) {
+        if (start.grid.length != goal.grid.length) {
+            throw new IllegalArgumentException("Start and Goal grid length doens't match!");
+        }
+        int N = start.grid.length;
+        int invStart = countInversions(start.grid);
+        int invGoal  = countInversions(goal.grid);
+
+        System.out.println("start:");
+        start.print();
+        System.out.println("goal:");
+        goal.print();
+
+        System.out.println("\ninvStart: " + invStart);
+        System.out.println("invGoal: " + invGoal);
+    
+        int blankRowStart = N - start.y;
+        int blankRowGoal  = N - goal.y;
+
+        System.out.println("blankRowStart: " + blankRowStart);
+        System.out.println("blankRowGoal: " + blankRowGoal);
+    
+        if (N % 2 == 1) {
+            return invStart % 2 == invGoal % 2;
+        } else {
+            return (invStart + blankRowStart) % 2 == (invGoal + blankRowGoal) % 2;
+        }
+    }
+    
+    private static int countInversions(int[][] grid) {
+        int N = grid.length;
+        int[] arr = new int[N*N];
+        int k = 0;
+        for (int[] row : grid) {
+            for (int v : row) if (v != 0) arr[k++] = v;
+        }
+
+        for (int l : arr) {
+            System.out.printf("%d ", l);
+        }
+        System.out.println();
+    
+        int inversions = 0;
+        for (int i = 0; i < k; i++) {
+            for (int j = i+1; j < k; j++) {
+                if (arr[i] > arr[j]) inversions++;
+            }
+        }
+        return inversions;
+    }
+
     public class Position {
         public final int x;
         public final int y;

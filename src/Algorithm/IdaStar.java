@@ -1,4 +1,6 @@
 package Algorithm;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import Node.NodeSearch;
@@ -30,6 +32,10 @@ public class IdaStar extends ASearchAlgorithm {
 
     public int search(NodeSearch node, int threshold) {
         stepCount++;
+        if (stepCount % 100000 == 0) System.out.println("stepCount: " + stepCount);
+        // if (node.getH() < 10) {
+        //     node.printNode();
+        // }
         if (node.getF() > threshold) {
             return node.getF();
         }
@@ -39,10 +45,20 @@ public class IdaStar extends ASearchAlgorithm {
             return -1;
         }
         int min = Integer.MAX_VALUE;
+
+        List<NodeSearch> children = new ArrayList<>();
+
         for (State state : node.state.neighbors()) {
             if (node.getParent() != null && state.equals(node.getParent().state)) continue; // skip going back to parent
-            int t = search(new NodeSearch(state, goal.state, node), threshold);
-            if (t == -1) return -1;
+            children.add(new NodeSearch(state, goal.state, node));
+        }
+
+        // sort by f-score ascending
+        children.sort(Comparator.comparingInt(NodeSearch::getF));
+
+        for (NodeSearch child : children) {
+            int t = search(child, threshold);
+            if (t == -1) return -1; // goal found
             if (t < min) min = t;
         }
         return min;

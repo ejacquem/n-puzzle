@@ -3,6 +3,8 @@ package Algorithm;
 import java.util.List;
 
 import Node.NodeSearch;
+import Node.StatePuzzle;
+import Utils.Ansi;
 
 public abstract class ASearchAlgorithm {
     protected NodeSearch start;
@@ -21,6 +23,16 @@ public abstract class ASearchAlgorithm {
         if (start.state == null || goal.state == null) {
             throw new IllegalArgumentException("start and goal states cannot be null");
         }
+
+        System.out.println("Solving with algorithm " + getClass().getSimpleName() + "...");
+        // if (start.state instanceof StatePuzzle) {
+        //     System.out.println("Problem type: " + start.state.getClass().getSimpleName());
+        //     if (!StatePuzzle.canReach((StatePuzzle) start.state, (StatePuzzle) goal.state)) {
+        //         System.out.println("Grid is not solvable");
+        //         return false;
+        //     }
+        // }
+
         this.start = start;
         this.goal = goal;
         stepCount = 0;
@@ -29,11 +41,15 @@ public abstract class ASearchAlgorithm {
         solve();
 
         long duration = System.nanoTime() - startTime;
-        System.out.println("Algorithm finished computing");
-        System.out.println("Algorithm used: " + getClass().getSimpleName());
-        System.out.println("Problem type: " + start.state.getClass().getSimpleName());
-        System.out.println("Step Count: " + stepCount);
-        System.out.println("Time: " + (duration / 1_000_000.0) + " ms");
+        System.out.println("┌──────────────────────────────────────────┐");
+        System.out.println("│           ALGORITHM REPORT               │");
+        System.out.println("├──────────────────────────────────────────┤");
+        System.out.println("  Algorithm used : " + Ansi.BOLD + getClass().getSimpleName() + Ansi.RESET);
+        System.out.println("  Problem type   : " + Ansi.BOLD + start.state.getClass().getSimpleName() + Ansi.RESET);
+        System.out.println("  Step Count     : " + Ansi.YELLOW + stepCount + Ansi.RESET);
+        System.out.println("  Time           : " + Ansi.YELLOW + (duration / 1_000_000.0) + " ms" + Ansi.RESET);
+        System.out.println("  Solution Move  : " + Ansi.YELLOW + endNode.countParent() + Ansi.RESET);
+        System.out.println("└──────────────────────────────────────────┘" + Ansi.RESET);
         return solutionFound;
     }
     protected abstract void solve();
